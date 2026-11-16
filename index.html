@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U.stra PLAY</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      width: min(90%, 720px);
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 { font-size: 38px; margin-bottom: 8px; }
+    .sub { color: #94a3b8; margin-bottom: 45px; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+    a {
+      text-decoration: none;
+      color: white;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 35px 15px;
+      transition: .2s;
+    }
+    a:hover {
+      background: #263750;
+      transform: translateY(-4px);
+    }
+    .emoji { font-size: 42px; }
+    h2 { margin: 15px 0 8px; }
+    p { color: #94a3b8; font-size: 13px; }
+    footer { margin-top: 45px; color: #64748b; font-size: 12px; }
+    @media(max-width: 480px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>U.stra PLAY</h1>
+    <div class="sub">PLAY MANAGEMENT SYSTEM</div>
+
+    <div class="cards">
+      <a href="./admin/">
+        <div class="emoji">⚙️</div>
+        <h2>관리자</h2>
+        <p>게임 관리 및 운영</p>
+      </a>
+
+      <a href="./games/">
+        <div class="emoji">🎮</div>
+        <h2>직원용 게임</h2>
+        <p>게임 참여 및 이용</p>
+      </a>
+    </div>
+
+    <footer>U.stra PLAY Management System</footer>
+  </main>
+</body>
+</html>

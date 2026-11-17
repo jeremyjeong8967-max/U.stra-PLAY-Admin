@@ -564,24 +564,40 @@
       const GAME_LABELS = { 0: '접속 순번 이벤트', 1: '행운 룰렛', 2: '오늘의 퀴즈', 3: '생일 맞추기' };
       const HIDDEN = '참여가 완료되었습니다. 결과는 별도로 안내드립니다.';
       const $ = id => document.getElementById(id);
-      // GitHub Pages 직접 접속 테스트: 이벤트 링크 없이 /games/를 열면
-      // 저장되지 않는 샘플 룰렛 미리보기를 표시합니다.
+      // GitHub Pages 직접 접속 테스트: ?game=quiz 또는 ?game=birthday로
+      // 기존 게임 화면을 각각 미리 볼 수 있습니다. 미리보기 참여 결과는 저장하지 않습니다.
       const linkedEvent = readEvent();
-      const previewMode = new URLSearchParams(location.search).get('preview') === '1' || !linkedEvent;
+      const previewParams = new URLSearchParams(location.search);
+      const requestedPreview = previewParams.get('game');
+      const previewGame = requestedPreview === 'quiz' || requestedPreview === '2' ? 2
+        : requestedPreview === 'birthday' || requestedPreview === '3' ? 3 : 1;
+      const previewMode = previewParams.get('preview') === '1' || !linkedEvent;
+      const previewConfigs = {
+        1: { prizeItems: '커피 쿠폰 | 1\n편의점 상품권 | 1\n간식 세트 | 1\n다음 기회 | 1' },
+        2: {
+          quizQuestion: 'U.stra PLAY 미리보기 퀴즈입니다. 다음 중 웹페이지를 새로고침해도 유지되는 기능은?',
+          quizOptions: '화면 디자인\n퀴즈 제한 시간\n브라우저 탭 색상',
+          quizAnswer: '퀴즈 제한 시간',
+          quizSeconds: '30'
+        },
+        3: {
+          birthdayHint: '가상의 직원 정보로 진행하는 생일 맞추기 테스트입니다.',
+          birthdayPeople: '기획팀 | 김하늘 | 여 | 3/8\n개발팀 | 이도윤 | 남 | 7/15\n인사팀 | 박서연 | 여 | 11/24'
+        }
+      };
+      const previewTitles = { 1: '행운 룰렛 미리보기', 2: '오늘의 퀴즈 미리보기', 3: '생일 맞추기 미리보기' };
       let eventData = linkedEvent || {
-        id: 'github-pages-demo-event',
-        title: 'U.stra PLAY 게임 미리보기',
-        game: 1,
+        id: `github-pages-demo-event-${previewGame}`,
+        title: `U.stra PLAY ${previewTitles[previewGame]}`,
+        game: previewGame,
         start: '2026-01-01T00:00',
         end: '2099-12-31T23:59',
         status: 'active',
         prize: '테스트용 가상 경품',
-        desc: 'GitHub Pages에서 직원용 게임 화면을 확인하기 위한 샘플 이벤트입니다. 가상의 이름과 사번으로 테스트해 주세요.',
+        desc: 'GitHub Pages에서 게임 화면을 확인하기 위한 샘플 이벤트입니다. 가상의 이름과 사번으로 테스트해 주세요.',
         multiple: false,
         showResult: true,
-        config: {
-          prizeItems: '커피 쿠폰 | 1\n편의점 상품권 | 1\n간식 세트 | 1\n다음 기회 | 1'
-        }
+        config: previewConfigs[previewGame]
       };
       let entry = null;
       let busy = false;

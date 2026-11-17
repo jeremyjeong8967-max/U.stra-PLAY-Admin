@@ -568,10 +568,12 @@
       // 기존 게임 화면을 각각 미리 볼 수 있습니다. 미리보기 참여 결과는 저장하지 않습니다.
       const linkedEvent = readEvent();
       const previewParams = new URLSearchParams(location.search);
-      const requestedPreview = previewParams.get('game');
+      const requestedPreview = (previewParams.get('game') || '').toLowerCase();
+      // game 파라미터가 명시되면 기존 이벤트 해시보다 개별 미리보기를 우선합니다.
+      const hasPreviewRequest = ['roulette', '1', 'quiz', '2', 'birthday', '3'].includes(requestedPreview);
       const previewGame = requestedPreview === 'quiz' || requestedPreview === '2' ? 2
         : requestedPreview === 'birthday' || requestedPreview === '3' ? 3 : 1;
-      const previewMode = previewParams.get('preview') === '1' || !linkedEvent;
+      const previewMode = previewParams.get('preview') === '1' || hasPreviewRequest || !linkedEvent;
       const previewConfigs = {
         1: { prizeItems: '커피 쿠폰 | 1\n편의점 상품권 | 1\n간식 세트 | 1\n다음 기회 | 1' },
         2: {
@@ -586,7 +588,7 @@
         }
       };
       const previewTitles = { 1: '행운 룰렛 미리보기', 2: '오늘의 퀴즈 미리보기', 3: '생일 맞추기 미리보기' };
-      let eventData = linkedEvent || {
+      let eventData = (linkedEvent && !hasPreviewRequest && previewParams.get('preview') !== '1') ? linkedEvent : {
         id: `github-pages-demo-event-${previewGame}`,
         title: `U.stra PLAY ${previewTitles[previewGame]}`,
         game: previewGame,

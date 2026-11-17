@@ -757,20 +757,19 @@
       function renderRoulette(config) {
         // 1차 샘플: 관리자 설정에 저장된 기존 가중치와 관계없이 모든 룰렛 항목을 균등 처리합니다.
         // 추후 가중치형을 도입할 때 이 부분을 추첨 방식 설정에 따라 분기합니다.
-        const prizes = DemoStore.prizes(config).map(prize => ({ ...prize, weight: 1 }));
+        // 샘플 룰렛은 경품 설정의 가중치와 무관하게 정확히 4개의 90도 영역으로 표시합니다.
+        const prizes = DemoStore.prizes(config).slice(0, 4).map(prize => ({ ...prize, weight: 1 }));
         const total = prizes.length;
-        const colors = ['#f5b94e', '#54b39d', '#7388e8', '#e57b8b', '#8f73c7', '#4aa6c8'];
-        let cursor = 0;
-        const stops = prizes.map((prize, index) => {
-          const start = cursor / total * 360;
-          cursor += prize.weight;
-          return `${colors[index % colors.length]} ${start}deg ${cursor / total * 360}deg`;
-        });
+        const colors = ['#f5b94e', '#54b39d', '#7388e8', '#e57b8b'];
+        // 각 색상 구간을 명시적으로 0~90, 90~180, 180~270, 270~360도로 고정합니다.
+        const stops = prizes.map((prize, index) =>
+          `${colors[index]} ${index * 90}deg ${(index + 1) * 90}deg`
+        );
         $('gameArea').innerHTML = `
           <div class="prize-layout">
             <div class="wheel-wrap"><div class="pointer"></div><div class="wheel" id="wheel" style="background:conic-gradient(${stops.join(',')})"></div><div class="wheel-center"><img class="play-symbol" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNSAyNSI+PHBhdGggZD0iTTE5LjYzNjMgNy44ODcwMkgxNS4yNzU4VjE1LjAxOEMxNS4yNzU4IDE3LjkzMzEgMTIuODM1MyAyMC4zMDMzIDkuODE4MTMgMjAuMzAzM0M2LjgwMDk2IDIwLjMwMzMgNC4zNjA0OSAxNy45Mzk5IDQuMzYwNDkgMTUuMDE4VjIuNTgxMzNMMCAwVjE1LjAxMTJDMCAxNi45NjU5IDAuNjExODc1IDE4Ljc4NDUgMS42NTI3NyAyMC4yOTY1QzIuMzcwMTQgMjEuMzMxNyAzLjI5MTQ3IDIyLjIyNCA0LjM2MDQ5IDIyLjkxODdDNS45MjE4MyAyMy45MzM1IDcuNzk5NjUgMjQuNTE5MiA5LjgxODEzIDI0LjUxOTJDMTEuODM2NiAyNC41MTkyIDEzLjcxNDQgMjMuOTI2NyAxNS4yNzU4IDIyLjkxODdDMTYuMzQ0OCAyMi4yMjQgMTcuMjY2MSAyMS4zMzE3IDE3Ljk4MzUgMjAuMjk2NUMxOS4wMzE0IDE4Ljc4NDUgMTkuNjM2MyAxNi45NjU5IDE5LjYzNjMgMTUuMDExMlY3Ljg4NzAyWiIgZmlsbD0iIzAzNTRGRiIvPjxwYXRoIGQ9Ik0yMS44MDk1IDI0LjUxOTJDMjMuMDEzNiAyNC41MTkyIDIzLjk4OTcgMjMuNTczOSAyMy45ODk3IDIyLjQwNzlDMjMuOTg5NyAyMS4yNDE4IDIzLjAxMzYgMjAuMjk2NSAyMS44MDk1IDIwLjI5NjVDMjAuNjA1MyAyMC4yOTY1IDE5LjYyOTIgMjEuMjQxOCAxOS42MjkyIDIyLjQwNzlDMTkuNjI5MiAyMy41NzM5IDIwLjYwNTMgMjQuNTE5MiAyMS44MDk1IDI0LjUxOTJaIiBmaWxsPSIjMDM1NEZGIi8+PC9zdmc+" alt="U.stra PLAY" width="32" height="32"></div></div>
             <div><h2>행운 룰렛을 돌려보세요</h2><div class="prizes">
-              ${prizes.map((prize, index) => `<div class="prize-row"><span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${colors[index % colors.length]}"></i> ${escapeHtml(prize.name)}</span><b>${(prize.weight / total * 100).toFixed(1)}%</b></div>`).join('')}
+              ${prizes.map((prize, index) => `<div class="prize-row"><span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${colors[index % colors.length]}"></i> ${escapeHtml(prize.name)}</span><b>25.0%</b></div>`).join('')}
             </div></div>
           </div>
           <button class="btn block" id="spinBtn" style="margin-top:18px">룰렛 돌리기</button>`;
@@ -786,7 +785,7 @@
             await finish(prize.name, !/다음 기회|꽝/.test(prize.name));
             // 다른 탭에서 먼저 완료한 결과가 있다면 그 결과를 우선합니다.
             if (entry.result !== prize.name) return showCompleted();
-            const center = (prizes.slice(0, index).reduce((value, item) => value + item.weight, 0) + prize.weight / 2) / total * 360;
+            const center = index * 90 + 45;
             $('wheel').style.transform = `rotate(${360 * 6 + (360 - center) % 360}deg)`;
             const timer = setTimeout(showCompleted, 5700);
             cleanupGame = () => clearTimeout(timer);

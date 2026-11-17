@@ -755,8 +755,10 @@
       // 4. 행운 룰렛: 저장 성공 후 연출, 재접속 시 같은 결과 표시
       // ============================================================
       function renderRoulette(config) {
-        const prizes = DemoStore.prizes(config);
-        const total = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+        // 1차 샘플: 관리자 설정에 저장된 기존 가중치와 관계없이 모든 룰렛 항목을 균등 처리합니다.
+        // 추후 가중치형을 도입할 때 이 부분을 추첨 방식 설정에 따라 분기합니다.
+        const prizes = DemoStore.prizes(config).map(prize => ({ ...prize, weight: 1 }));
+        const total = prizes.length;
         const colors = ['#f5b94e', '#54b39d', '#7388e8', '#e57b8b', '#8f73c7', '#4aa6c8'];
         let cursor = 0;
         const stops = prizes.map((prize, index) => {
